@@ -1,0 +1,6 @@
+    What is Computer Vision?
+    Goals and challenges of computer vision
+        Computer vision workflow:
+    Computer vision tasks
+    Low-level computer vision
+    High-level computer vision

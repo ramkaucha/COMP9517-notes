@@ -1,0 +1,15 @@
+    What is image formation?
+    Projection mathematics
+    Perspective projection
+    Affine projection
+    Radication distortions
+    Comapring to human vision
+        Colour spaces: RGB
+        Colour spaces: HSV
+        Colour spaces: YCbCr
+        Colour spaces: L*a*b*
+    Digital image formation
+        Digitisation by spatial sampling
+    Digital colour images
+    Spatial resolution
+    Quantisation

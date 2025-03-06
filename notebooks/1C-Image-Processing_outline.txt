@@ -1,0 +1,52 @@
+Image Processing
+    Types of image processing
+    Spatial domain operations
+    Point operation
+    Contrast stretching
+    Intensity thresholding
+    Automatic intensity thresholding
+    Multilevel thresholding
+    Intensity inversion
+    Log transformation
+    Power transformation
+        Example
+    Piecewise linear transformation
+    Piecewise contrast stretching
+    Gray-level slicing
+    Bit-plane slicing
+    Histogram of pixel values
+    Histogram based thresholding
+Comparison of thresholding methods
+    Histogram processing
+        Histogram equalisation
+        Histogram specification (histogram matching)
+            Histogram matching examples
+    Arithmetic and logical operations
+        Addition and subtraction
+        bitwise AND and OR
+    Averaging
+    Spatial filtering on groups of pixels
+        Spatial filtering by convolution
+        Equivalent notations of convolution
+        Why must kernel be flipped
+        Fixing the border problem
+        Properties of convolution
+    Simplest smoothing filter
+    Gaussian filter
+    Gaussian filter Example
+    Median filter
+        Median filtering example
+    Gaussian vs median filtering
+    Sharpening by unsharp masking
+    Pooling
+    Derivative filters
+        Gaussian derivative filters
+    Prewitt and Sobel kernels
+        Separable filter kernels
+        Example of Prewitt filtering
+    Laplacian filtering
+        Sharpening using the Laplacian
+    Intensity gradient vector
+        Edge detection with gradient magnitude
+        Edge detection with the Laplacian
+    Selecting the right spatial scale
