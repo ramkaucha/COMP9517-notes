@@ -1,0 +1,114 @@
+name: Publish Jupyter Notebooks as HTML
+
+on:
+  push:
+    branches: [ main ]  
+    paths:
+      - '**.ipynb'     
+    workflow_dispatch:
+
+jobs:
+  convert-notebooks:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install jupyter nbconvert
+        
+    - name: Convert notebooks to HTML
+      run: |
+        find . -name "*.ipynb" -not -path "*/\.*" | while read notebook; do
+          echo "Converting $notebook to HTML"
+          jupyter nbconvert --to html "$notebook"
+        done
+        
+    - name: Upload HTML files as artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: notebook-html
+        path: ./**/*.html
+        
+      
+    - name: Create HTML directory and generate index
+      run: |
+        mkdir -p html_output
+        find . -name "*.html" -not -path "*/\.*" -not -path "*/html_output/*" -exec cp {} html_output/ \;
+        
+        # Generate index.html with links to all notebooks
+        echo "<!DOCTYPE html>
+        <html>
+        <head>
+            <title>Jupyter Notebook Index</title>
+            <meta charset=\"utf-8\">
+            <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">
+            <style>
+                body { 
+                    font-family: Arial, sans-serif; 
+                    line-height: 1.6;
+                    max-width: 900px;
+                    margin: 0 auto;
+                    padding: 20px;
+                }
+                h1 { color: #333; }
+                .notebook-list { 
+                    list-style-type: none;
+                    padding: 0;
+                }
+                .notebook-list li {
+                    margin: 10px 0;
+                    padding: 10px;
+                    border-radius: 5px;
+                    background-color: #f5f5f5;
+                }
+                .notebook-list a {
+                    text-decoration: none;
+                    color: #0366d6;
+                    font-weight: bold;
+                }
+                .notebook-list a:hover {
+                    text-decoration: underline;
+                }
+                .last-updated {
+                    font-size: 0.8em;
+                    color: #666;
+                    margin-top: 30px;
+                }
+            </style>
+        </head>
+        <body>
+            <h1>Jupyter Notebook Index</h1>
+            <p>Below is a list of all available Jupyter notebooks:</p>
+            <ul class=\"notebook-list\">" > html_output/index.html
+            
+        for html_file in $(find html_output -name "*.html" | sort); do
+            if [ "$(basename $html_file)" != "index.html" ]; then
+                filename=$(basename $html_file)
+                original_file=$(find . -name "$filename" -not -path "*/html_output/*" | head -n 1)
+                original_path=${original_file#./}
+                original_dir=$(dirname "$original_path")
+                
+                echo "                <li><a href=\"$filename\">$original_path</a></li>" >> html_output/index.html
+            fi
+        done
+        
+        # Finish the HTML document
+        echo "            </ul>
+            <p class=\"last-updated\">Last updated: $(date)</p>
+        </body>
+        </html>" >> html_output/index.html
+      
+    - name: Deploy to GitHub Pages
+      uses: actions/deploy-pages@v2
+      if: github.ref == 'refs/heads/main' 
+      with:
+        path: html_output
