@@ -5,7 +5,15 @@ on:
     branches: [ main ]  
     paths:
       - '**.ipynb'
-  workflow_dispatch:  # This allows manual triggering
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
   convert-notebooks:
@@ -13,7 +21,7 @@ jobs:
     
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -32,18 +40,11 @@ jobs:
           jupyter nbconvert --to html "$notebook"
         done
         
-    - name: Upload HTML files as artifacts
-      uses: actions/upload-artifact@v4  # Updated from v3 to v4
-      with:
-        name: notebook-html
-        path: ./**/*.html
-        
     - name: Create HTML directory and generate index
       run: |
         mkdir -p html_output
         find . -name "*.html" -not -path "*/\.*" -not -path "*/html_output/*" -exec cp {} html_output/ \;
         
-        # Generate index.html with links to all notebooks
         echo "<!DOCTYPE html>
         <html>
         <head>
@@ -104,12 +105,22 @@ jobs:
             <p class=\"last-updated\">Last updated: $(date)</p>
         </body>
         </html>" >> html_output/index.html
+    
     - name: Setup Pages
       uses: actions/configure-pages@v3
-
-    - name: Deploy to GitHub Pages
-      uses: actions/deploy-pages@v2
+      
+    - name: Upload Pages artifact
+      uses: actions/upload-pages-artifact@v2
       with:
         path: html_output
-      
-
+    
+  deploy:
+    needs: convert-notebooks
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
