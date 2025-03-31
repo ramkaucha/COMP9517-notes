@@ -4,8 +4,8 @@ on:
   push:
     branches: [ main ]  
     paths:
-      - '**.ipynb'     
-    workflow_dispatch:
+      - '**.ipynb'
+  workflow_dispatch:  # This allows manual triggering
 
 jobs:
   convert-notebooks:
@@ -33,12 +33,11 @@ jobs:
         done
         
     - name: Upload HTML files as artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4  # Updated from v3 to v4
       with:
         name: notebook-html
         path: ./**/*.html
         
-      
     - name: Create HTML directory and generate index
       run: |
         mkdir -p html_output
@@ -101,14 +100,9 @@ jobs:
             fi
         done
         
-        # Finish the HTML document
         echo "            </ul>
             <p class=\"last-updated\">Last updated: $(date)</p>
         </body>
         </html>" >> html_output/index.html
       
-    - name: Deploy to GitHub Pages
-      uses: actions/deploy-pages@v2
-      if: github.ref == 'refs/heads/main' 
-      with:
-        path: html_output
+
