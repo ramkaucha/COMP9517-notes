@@ -104,5 +104,12 @@ jobs:
             <p class=\"last-updated\">Last updated: $(date)</p>
         </body>
         </html>" >> html_output/index.html
+    - name: Setup Pages
+      uses: actions/configure-pages@v3
+
+    - name: Deploy to GitHub Pages
+      uses: actions/deploy-pages@v2
+      with:
+        path: html_output
       
 
